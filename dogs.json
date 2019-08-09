@@ -1,0 +1,74 @@
+{
+  "families": [
+    {
+      "address": {
+        "street": "644 Glen Summit",
+        "city": "St. Charles",
+        "state": "Missouri",
+        "zip": "63304"
+      },
+      "dogs": [
+        {
+          "name": "Dasher",
+          "breed": "Whippet"
+        }
+      ],
+      "people": [
+        {
+          "name": "Mark Volkmann"
+        },
+        {
+          "name": "Tami Volkmann"
+        }
+      ]
+    },
+    {
+      "address": {
+        "street": "5250 Murdock",
+        "city": "St. Louis",
+        "state": "Missouri",
+        "zip": "63109"
+      },
+      "dogs": [
+        {
+          "name": "Maisey",
+          "breed": "Treeing Walker Coonhound"
+        },
+        {
+          "name": "Oscar",
+          "breed": "German Shorthaired Pointer"
+        }
+      ],
+      "people": [
+        {
+          "name": "RC Nelson"
+        },
+        {
+          "name": "Amanda Nelson"
+        }
+      ]
+    },
+    {
+      "address": {
+        "street": "3208 Crow Ct.",
+        "city": "Columbia",
+        "state": "Missouri",
+        "zip": "65202"
+      },
+      "dogs": [
+        {
+          "name": "Ramsey",
+          "breed": "Native American Indian Dog"
+        }
+      ],
+      "people": [
+        {
+          "name": "Jeremy Volkmann"
+        },
+        {
+          "name": "Meghan Volkmann"
+        }
+      ]
+    }
+  ]
+}

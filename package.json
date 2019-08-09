@@ -1,0 +1,20 @@
+{
+  "name": "dogs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dbi": "psql -Upostgres -d dogs",
+    "dbload": "node src/load-db dogs.json",
+    "dbsetup": "psql -Upostgres -d dogs -f database.sql",
+    "dbstart": "pg_ctl -D /usr/local/var/postgres start",
+    "format": "prettier --write src/**/*.js",
+    "lint": "eslint src/**/*.js",
+    "start": "nodemon src/server.js"
+  },
+  "author": "R. Mark Volkmann <r.mark.volkmann@gmail.com> (https://mvolkmann.github.io/)",
+  "license": "MIT",
+  "dependencies": {
+    "postgresql-easy": "^1.2.5"
+  }
+}
