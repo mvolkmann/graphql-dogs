@@ -1,7 +1,8 @@
-import {arrayOf, func, object, string} from 'prop-types';
+import {func, object, string} from 'prop-types';
 import React, {useRef} from 'react';
 
 import {useFormInput} from '../custom-hooks';
+import {getSortedValues} from '../util';
 
 import './list.scss';
 
@@ -33,13 +34,16 @@ function List({
     selectItem(item);
   }
 
+  const itemArray = getSortedValues(items, 'name');
+
   return (
     <form className="list" onSubmit={add}>
       <select onChange={onSelect} size="10" value={value}>
-        {items.map((item, index) => {
-          const display = item[displayProp];
-          return <option key={index}>{display}</option>;
-        })}
+        {itemArray.map(item => (
+          <option key={item.id} value={item.id}>
+            {item[displayProp]}
+          </option>
+        ))}
       </select>
       <input
         onChange={onChange}
@@ -66,7 +70,7 @@ List.propTypes = {
   addItem: func.isRequired,
   deleteItem: func.isRequired,
   displayProp: string.isRequired,
-  items: arrayOf(object).isRequired,
+  items: object.isRequired,
   placeholder: string,
   selectedItem: object,
   selectItem: func.isRequired

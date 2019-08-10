@@ -3,19 +3,20 @@ import ShortUniqueId from 'short-unique-id';
 import List from './list/list';
 
 import {useFormInput} from './custom-hooks';
+import {getSortedValues} from './util';
 
 import './App.scss';
 
 const uid = new ShortUniqueId();
 
 function App() {
-  const [dogs, setDogs] = useState([]);
-  const [people, setPeople] = useState([]);
+  const [dogs, setDogs] = useState({});
+  const [people, setPeople] = useState({});
   const [selectedDog, setSelectedDog] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
 
-  if (!selectedDog && dogs.length) setSelectedDog(dogs[0]);
-  if (!selectedPerson && people.length) setSelectedPerson(people[0]);
+  ensureSelected(selectedDog, dogs, setSelectedDog);
+  ensureSelected(selectedPerson, people, setSelectedPerson);
 
   const [changeStreet, street] = useFormInput('');
   const [changeCity, city] = useFormInput('');
@@ -24,12 +25,12 @@ function App() {
 
   function addDog(name) {
     const id = uid.sequentialUUID();
-    setDogs([...dogs, {id, name, personIds: []}]);
+    setDogs({...dogs, [id]: {id, name, peopleIds: []}});
   }
 
   function addPerson(name) {
     const id = uid.sequentialUUID();
-    setPeople([...people, {id, name, dogIds: []}]);
+    setPeople({...people, [id]: {id, name, dogIds: []}});
   }
 
   function associate() {
@@ -37,9 +38,11 @@ function App() {
     const {id: personId, dogIds} = selectedPerson;
     if (!peopleIds.includes(personId)) {
       peopleIds.push(personId);
+      setSelectedDog(selectedDog);
     }
     if (!dogIds.includes(dogId)) {
       dogIds.push(dogId);
+      setSelectedPerson(selectedPerson);
     }
   }
 
@@ -55,6 +58,11 @@ function App() {
     setSelectedPerson(people.length > 1 ? null : people[0]);
   }
 
+  function ensureSelected(selectedItem, items, setSelected) {
+    if (selectedItem) return;
+    const values = getSortedValues(items);
+    if (values.length) setSelected(values[0]);
+  }
   function getAddressForm() {
     return (
       <form className="address-form">
@@ -78,48 +86,73 @@ function App() {
     );
   }
 
+  function getDogs() {
+    if (!selectedPerson) return [];
+    const result = selectedPerson.dogIds
+      .map(dogId => dogs[dogId].name)
+      .join(', ');
+    console.log('App.js getDogs: result =', result);
+    return result;
+  }
+
+  function getPeople() {
+    if (!selectedDog) return [];
+    const result = selectedDog.peopleIds
+      .map(personId => people[personId].name)
+      .join(', ');
+    console.log('App.js getPeople: result =', result);
+    return result;
+  }
+
   function selectDog(dog) {
     setSelectedDog(dog);
-    // Select all the associated people.
-    for (const personId of dog.personIds) {
-      //TODO
-    }
   }
 
   function selectPerson(person) {
     setSelectedPerson(person);
-    // Select all the associated dogs.
-    for (const dogId of person.dogIds) {
-      //TODO
-    }
   }
+
+  let report = '';
+  if (selectedPerson) {
+    report += selectedPerson.name + ' owns ' + getDogs() + '.';
+  }
+  if (selectedDog) {
+    report += selectedDog.name + ' is owned by ' + getPeople() + '.';
+  }
+  console.log('App.js x: report =', report);
 
   return (
     <div className="app">
-      <List
-        addItem={addPerson}
-        deleteItem={deletePerson}
-        displayProp="name"
-        items={people}
-        placeholder="new person name"
-        selectedItem={selectedPerson}
-        selectItem={selectPerson}
-      />
-      <div className="middle">
-        {getAddressForm()}
-        <button disabled={!selectedDog || !selectedPerson} onClick={associate}>
-          Associate
-        </button>
+      <div className="top">
+        <List
+          addItem={addPerson}
+          deleteItem={deletePerson}
+          displayProp="name"
+          items={people}
+          placeholder="new person name"
+          selectedItem={selectedPerson}
+          selectItem={selectPerson}
+        />
+        <div className="middle">
+          {getAddressForm()}
+          <button
+            disabled={!selectedDog || !selectedPerson}
+            onClick={associate}
+          >
+            Associate
+          </button>
+        </div>
+        <List
+          addItem={addDog}
+          deleteItem={deleteDog}
+          displayProp="name"
+          items={dogs}
+          placeholder="new dog name"
+          selectedItem={selectedDog}
+          selectItem={selectDog}
+        />
       </div>
-      <List
-        addItem={addDog}
-        deleteItem={deleteDog}
-        displayProp="name"
-        items={dogs}
-        placeholder="new dog name"
-        selectedItem={selectedDog}
-        selectItem={selectDog}
-      />
+      <div className="bottom">{report}</div>
     </div>
   );
 }

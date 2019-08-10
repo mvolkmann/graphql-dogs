@@ -9,10 +9,12 @@
     "short-unique-id": "^1.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "format": "prettier --write src/**/*.{js,scss}",
+    "lint": "eslint --cache src/**/*.js",
+    "reinstall": "rm -rf node_modules package-lock.json && npm install",
+    "start": "react-scripts start",
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -30,6 +32,14 @@
     ]
   },
   "devDependencies": {
-    "node-sass": "^4.12.0"
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-html": "^6.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-react": "^7.14.3",
+    "node-sass": "^4.12.0",
+    "normalize.css": "^8.0.1",
+    "prettier": "^1.18.2"
   }
 }
