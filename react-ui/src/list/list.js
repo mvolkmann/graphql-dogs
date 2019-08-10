@@ -28,6 +28,11 @@ function List({
     inputRef.current.focus();
   }
 
+  function deleteIt(event, selectedItem) {
+    event.preventDefault();
+    deleteItem(selectedItem);
+  }
+
   function onSelect(event) {
     const id = event.target.value;
     selectItem(items[id]);
@@ -56,7 +61,7 @@ function List({
         </button>
         <button
           disabled={!selectedItem}
-          onClick={() => deleteItem(selectedItem)}
+          onClick={e => deleteIt(e, selectedItem)}
         >
           Delete
         </button>

@@ -1,48 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import ShortUniqueId from 'short-unique-id';
+//import ShortUniqueId from 'short-unique-id';
 import List from './list/list';
 
 import {useFormInput} from './custom-hooks';
-import {getJson} from './fetch-util';
+import {deleteResource, getJson, postJson} from './fetch-util';
 import {getSortedValues} from './util';
 
 import './App.scss';
 
-const uid = new ShortUniqueId();
+//const uid = new ShortUniqueId();
+
+function handleError(title, error) {
+  console.error(title, error);
+}
 
 function App() {
   const [dogs, setDogs] = useState({});
   const [people, setPeople] = useState({});
   const [selectedDog, setSelectedDog] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
-
-  async function loadDogs() {
-    try {
-      const dogs = await getJson('dogs');
-      const dogMap = dogs.reduce((acc, dog) => {
-        dog.peopleIds = [];
-        acc[dog.id] = dog;
-        return acc;
-      }, {});
-      setDogs(dogMap);
-    } catch (e) {
-      console.error('error loading dogs:', e);
-    }
-  }
-
-  async function loadPeople() {
-    try {
-      const people = await getJson('people');
-      const personMap = people.reduce((acc, person) => {
-        person.dogIds = [];
-        acc[person.id] = person;
-        return acc;
-      }, {});
-      setPeople(personMap);
-    } catch (e) {
-      console.error('error loading dogs:', e);
-    }
-  }
 
   useEffect(() => {
     loadDogs();
@@ -57,14 +33,24 @@ function App() {
   const [changeState, state] = useFormInput('');
   const [changeZip, zip] = useFormInput('');
 
-  function addDog(name) {
-    const id = uid.sequentialUUID();
-    setDogs({...dogs, [id]: {id, name, peopleIds: []}});
+  async function addDog(name) {
+    try {
+      const id = await postJson('dogs', {name});
+      console.log('App.js addDog: id =', id);
+      setDogs({...dogs, [id]: {id, name, peopleIds: []}});
+    } catch (e) {
+      handleError('addDog', e);
+    }
   }
 
-  function addPerson(name) {
-    const id = uid.sequentialUUID();
-    setPeople({...people, [id]: {id, name, dogIds: []}});
+  async function addPerson(name) {
+    try {
+      const id = await postJson('people', {name});
+      console.log('App.js addPerson: id =', id);
+      setPeople({...people, [id]: {id, name, dogIds: []}});
+    } catch (e) {
+      handleError('addPerson', e);
+    }
   }
 
   function associate() {
@@ -80,16 +66,31 @@ function App() {
     }
   }
 
-  function deleteDog(dog) {
+  async function deleteDog(dog) {
     const {id} = dog;
-    setDogs(dogs.filter(dog => dog.id !== id));
-    setSelectedDog(dogs.length > 1 ? null : dogs[0]);
+    try {
+      const res = await deleteResource('dogs/' + id);
+      console.log('App.js deleteDog: res =', res);
+      delete dogs[id];
+      setDogs(dogs);
+      setSelectedDog(dogs.length > 1 ? null : dogs[0]);
+    } catch (e) {
+      handleError('deleteDog', e);
+    }
   }
 
-  function deletePerson(person) {
+  async function deletePerson(person) {
+    console.log('App.js deletePerson: person =', person);
     const {id} = person;
-    setPeople(people.filter(person => person.id !== id));
-    setSelectedPerson(people.length > 1 ? null : people[0]);
+    try {
+      const res = await deleteResource('people/' + id);
+      console.log('App.js deletePerson: res =', res);
+      delete people[id];
+      setPeople(people);
+      setSelectedPerson(people.length > 1 ? null : people[0]);
+    } catch (e) {
+      handleError('deletePerson', e);
+    }
   }
 
   function ensureSelected(selectedItem, items, setSelected) {
@@ -130,6 +131,34 @@ function App() {
     return selectedDog.peopleIds
       .map(personId => people[personId].name)
       .join(', ');
+  }
+
+  async function loadDogs() {
+    try {
+      const dogs = await getJson('dogs');
+      const dogMap = dogs.reduce((acc, dog) => {
+        dog.peopleIds = [];
+        acc[dog.id] = dog;
+        return acc;
+      }, {});
+      setDogs(dogMap);
+    } catch (e) {
+      handleError('loadDogs', e);
+    }
+  }
+
+  async function loadPeople() {
+    try {
+      const people = await getJson('people');
+      const personMap = people.reduce((acc, person) => {
+        person.dogIds = [];
+        acc[person.id] = person;
+        return acc;
+      }, {});
+      setPeople(personMap);
+    } catch (e) {
+      handleError('loadPeople', e);
+    }
   }
 
   function selectDog(dog) {

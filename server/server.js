@@ -41,7 +41,12 @@ app.get('/heartbeat', async (req, res) => {
 
 app.delete('/dogs/:id', async (req, res) => {
   const {id} = req.params;
-  pg.query(`delete from dogs where id = ${id}`);
+  try {
+    pg.query(`delete from dog where id = ${id}`);
+    res.sendStatus(200);
+  } catch (e) {
+    res.send(e.message).status(500);
+  }
 });
 
 app.get('/dogs', async (req, res) => {
@@ -56,15 +61,15 @@ app.get('/dogs', async (req, res) => {
 
 app.post('/dogs', async (req, res) => {
   const dog = req.body;
-  const {id} = dog;
+  let {id} = dog;
 
   try {
     if (id === undefined) {
-      pg.insert('dog', dog);
+      id = await pg.insert('dog', dog);
     } else {
       pg.updateById('dog', id, dog);
     }
-    res.sendStatus(200);
+    res.send(String(id));
   } catch (e) {
     handleError(res, 'insert/update dog', e);
   }
@@ -72,7 +77,12 @@ app.post('/dogs', async (req, res) => {
 
 app.delete('/people/:id', async (req, res) => {
   const {id} = req.params;
-  pg.query(`delete from people where id = ${id}`);
+  try {
+    pg.query(`delete from person where id = ${id}`);
+    res.sendStatus(200);
+  } catch (e) {
+    res.send(e.message).status(500);
+  }
 });
 
 app.get('/people', async (req, res) => {
@@ -87,15 +97,15 @@ app.get('/people', async (req, res) => {
 
 app.post('/people', async (req, res) => {
   const person = req.body;
-  const {id} = person;
+  let {id} = person;
 
   try {
     if (id === undefined) {
-      pg.insert('person', person);
+      id = await pg.insert('person', person);
     } else {
       pg.updateById('person', id, person);
     }
-    res.sendStatus(200);
+    res.send(String(id));
   } catch (e) {
     handleError(res, 'insert/update person', e);
   }
