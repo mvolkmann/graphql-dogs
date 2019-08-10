@@ -17,7 +17,7 @@ function List({
 }) {
   const inputRef = useRef();
 
-  const value = selectedItem ? selectedItem[displayProp] : '';
+  const id = selectedItem ? selectedItem.id : '';
 
   const [onChange, newValue, setNewValue] = useFormInput('');
 
@@ -29,16 +29,15 @@ function List({
   }
 
   function onSelect(event) {
-    const {value} = event.target;
-    const item = items.find(item => item[displayProp] === value);
-    selectItem(item);
+    const id = event.target.value;
+    selectItem(items[id]);
   }
 
   const itemArray = getSortedValues(items, 'name');
 
   return (
     <form className="list" onSubmit={add}>
-      <select onChange={onSelect} size="10" value={value}>
+      <select onChange={onSelect} size="10" value={id}>
         {itemArray.map(item => (
           <option key={item.id} value={item.id}>
             {item[displayProp]}

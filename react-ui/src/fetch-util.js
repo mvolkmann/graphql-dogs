@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
-import {SERVER_URL} from './config';
+
+const SERVER_URL = 'http://localhost:1919/';
 
 const options = {};
 

@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ShortUniqueId from 'short-unique-id';
 import List from './list/list';
 
 import {useFormInput} from './custom-hooks';
+import {getJson} from './fetch-util';
 import {getSortedValues} from './util';
 
 import './App.scss';
@@ -14,6 +15,39 @@ function App() {
   const [people, setPeople] = useState({});
   const [selectedDog, setSelectedDog] = useState(null);
   const [selectedPerson, setSelectedPerson] = useState(null);
+
+  async function loadDogs() {
+    try {
+      const dogs = await getJson('dogs');
+      const dogMap = dogs.reduce((acc, dog) => {
+        dog.peopleIds = [];
+        acc[dog.id] = dog;
+        return acc;
+      }, {});
+      setDogs(dogMap);
+    } catch (e) {
+      console.error('error loading dogs:', e);
+    }
+  }
+
+  async function loadPeople() {
+    try {
+      const people = await getJson('people');
+      const personMap = people.reduce((acc, person) => {
+        person.dogIds = [];
+        acc[person.id] = person;
+        return acc;
+      }, {});
+      setPeople(personMap);
+    } catch (e) {
+      console.error('error loading dogs:', e);
+    }
+  }
+
+  useEffect(() => {
+    loadDogs();
+    loadPeople();
+  }, []);
 
   ensureSelected(selectedDog, dogs, setSelectedDog);
   ensureSelected(selectedPerson, people, setSelectedPerson);
@@ -60,7 +94,7 @@ function App() {
 
   function ensureSelected(selectedItem, items, setSelected) {
     if (selectedItem) return;
-    const values = getSortedValues(items);
+    const values = getSortedValues(items, 'name');
     if (values.length) setSelected(values[0]);
   }
   function getAddressForm() {
@@ -88,20 +122,14 @@ function App() {
 
   function getDogs() {
     if (!selectedPerson) return [];
-    const result = selectedPerson.dogIds
-      .map(dogId => dogs[dogId].name)
-      .join(', ');
-    console.log('App.js getDogs: result =', result);
-    return result;
+    return selectedPerson.dogIds.map(dogId => dogs[dogId].name).join(', ');
   }
 
   function getPeople() {
     if (!selectedDog) return [];
-    const result = selectedDog.peopleIds
+    return selectedDog.peopleIds
       .map(personId => people[personId].name)
       .join(', ');
-    console.log('App.js getPeople: result =', result);
-    return result;
   }
 
   function selectDog(dog) {
@@ -109,6 +137,7 @@ function App() {
   }
 
   function selectPerson(person) {
+    console.log('App.js selectPerson: person =', person);
     setSelectedPerson(person);
   }
 
